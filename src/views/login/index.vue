@@ -26,7 +26,8 @@
 </template>
 
 <script>
-// import { log } from 'util';
+// 引入存储工具
+import local from '@/utils/local.js'
 export default {
   data () {
     const checkMobile = (rule, value, callback) => {
@@ -55,17 +56,27 @@ export default {
   },
   methods: {
     loginCheck () {
-      this.$refs['loginFrom'].validate(valid => {
+      // 用pramise对象的方式发请求
+      // this.$refs['loginFrom'].validate(valid => {
+      //   if (valid) {
+      //     console.log(valid)
+      //     this.$axios.post('authorizations', this.loginFrom).then(res => {
+      //       // 保存用户信息token
+      //       local.setUser(res.data.data)
+      //       this.$router.push('/')
+      //     }).catch(() => {
+      //       this.$message.error('手机号或验证码错误')
+      //     })
+      //   }
+      // })
+      // 用async await方式发请求
+      this.$refs['loginFrom'].validate(async valid => {
         if (valid) {
-          console.log(valid)
-          this.$axios
-            .post('authorizations', this.loginFrom)
-            .then(result => {
-              this.$router.push('/')
-            })
-            .catch(() => {
-              this.$message.error('手机号或验证码错误')
-            })
+          try {
+            const res = await this.$axios.post('authorizations', this.loginFrom)
+            local.setUser(res.data.data)
+            this.$router.push('/')
+          } catch (e) { this.$message.error('手机号或验证码错误') }
         }
       })
     }
